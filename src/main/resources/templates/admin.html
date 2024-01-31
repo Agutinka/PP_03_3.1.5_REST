@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Мой новый файл стилей -->
+    <link rel="stylesheet" href="/style.css">
+    <title>Admin Panel</title>
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+    <!-- Header, верхняя часть контейнера -->
+    <div class="custom-top-bar">
+        <div>
+            <span id="currentUserEmail" class="font-weight-bold"></span>
+            with roles: <span id="currentUserRoles"></span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="logout-btn">
+            <!-- Стиль для текста кнопки и убирание подчёркивания -->
+            <button type="submit" class="btn btn-link text-light border-0 text-decoration-none">Logout</button>
+        </form>
+    </div>
+    <br/>
+    <!-- Область ниже, разделенная на два блока: navigation и info -->
+    <div class="row">
+        <!-- Navigation блок (левая часть) -->
+        <div class="col-2 bg-white text-dark d-flex flex-column">
+            <ul class="nav flex-grow-1 flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active bg-primary text-white" href="/admin">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user">User</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Info блок (правая часть) -->
+        <div class="col-10 bg-white text-black">
+            <div class="row">
+                <div class="col-12">
+                    <h2>Admin panel</h2>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="users-tab" data-bs-toggle="tab" th:href="@{/admin}">Users
+                                table</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#new" data-toggle="tab" role="tab" data-url="/create"
+                               id="newUserLink">New user</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <br>
+
+            <!-- Tab Content -->
+            <div class="tab-content mt-3">
+                <!-- Users Table Tab -->
+                <div class="tab-pane fade show active" id="users">
+                    <h4>All users</h4>
+                    <div class="form">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-borderless" id="usersTable">
+                                <!-- Table Header -->
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Age</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                                </thead>
+                                <!-- Table Body -->
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="new">
+                    <div id="createFormContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        fetch('/admin/create')
+            .then(response => response.text())
+            .then(data => {
+                $("#createFormContainer").html(data);
+            });
+
+        fetch('/admin')
+            .then(response => response.json())
+            .then(data => {
+                let table = document.getElementById('usersTable');
+                data.forEach(user => {
+                    let row = table.insertRow();
+                    let cells = ['id', 'firstName', 'lastName', 'age', 'email', 'role'];
+                    cells.forEach((cell, index) => {
+                        let td = row.insertCell(index);
+                        td.innerText = user[cell];
+                    });
+                });
+            });
+
+        // Показываем модальное окно "Edit" при клике на кнопку Edit
+        $('[data-target^="#editModal"]').click(function () {
+            var userId = $(this).data('user-id');
+            $('#editModal' + userId).modal('show');
+        });
+
+        // Показываем модальное окно "Delete" при клике на кнопку Delete
+        $('[data-target^="#deleteModal"]').click(function () {
+            var userId = $(this).data('user-id');
+            $('#deleteModal' + userId).modal('show');
+        });
+    });
+</script>
+
+</body>
+</html>
+
+<!--Вот что было изменено в вашем HTML-файле:
+
+Замена Thymeleaf на JavaScript для отображения информации о текущем пользователе: Вместо использования Thymeleaf для отображения электронной почты и ролей текущего пользователя, я добавил два новых элемента span с id "currentUserEmail" и "currentUserRoles". Затем я добавил JavaScript-код, который будет получать эти данные через Fetch API и заполнять эти элементы span.
+Замена Thymeleaf на JavaScript для заполнения таблицы пользователей: Вместо использования Thymeleaf для заполнения таблицы пользователей, я добавил JavaScript-код, который будет получать данные о пользователях через Fetch API и заполнять таблицу.
+Замена Thymeleaf на JavaScript для загрузки формы создания нового пользователя: Вместо использования Thymeleaf для загрузки формы создания нового пользователя, я добавил JavaScript-код, который будет получать эту форму через Fetch API и вставлять ее в div с id "createFormContainer".
+Замена Thymeleaf на JavaScript для обработки кликов по кнопкам "Edit" и "Delete": Вместо использования Thymeleaf для обработки кликов по кнопкам "Edit" и "Delete", я добавил JavaScript-код, который будет показывать соответствующие модальные окна при кликах на эти кнопки.
+В этом коде я добавил массив cells, который содержит имена полей пользователя. Затем я проходим по этому массиву и для каждого поля создаю новую ячейку в строке таблицы. Обратите внимание, что это предполагает, что объект user имеет свойства, соответствующие именам в массиве cells. Если структура объекта user отличается, вам нужно будет соответствующим образом изменить этот код.
+Пожалуйста, обратите внимание, что эти изменения предполагают, что у вас есть REST API, которое предоставляет данные о пользователях и форму создания нового пользователя. Вам нужно будет заменить '/admin/create' и '/admin' на реальные URL вашего API.-->

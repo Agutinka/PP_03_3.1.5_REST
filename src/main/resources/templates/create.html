@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Мой новый файл стилей -->
+    <link rel="stylesheet" href="/style.css">
+
+    <title>Добавить нового пользователя</title>
+
+</head>
+<body>
+<!-- Tab Content -->
+<div class="tab-content mt-3">
+    <!-- New User Tab -->
+
+    <h4>Add new user</h4>
+    <div id="createFormContainer">
+        <div class="form">
+            <form action="#" method="POST" id="createUserForm">
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="username">First name</label>
+                        <input type="text" id="username" name="username" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="secondname">Last name</label>
+                        <input type="text" id="secondname" name="secondname" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="text" id="age" name="age" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" name="email" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control"/>
+                    </div>
+
+                    <div class="form-group role-group">
+                        <label for="roleSelect">Role</label>
+                        <select class="form-control" id="roleSelect" name="roles" multiple data-live-search="true">
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Add new user</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        fetch('/admin/roles')
+            .then(response => response.json())
+            .then(data => {
+                let select = document.getElementById('roleSelect');
+                data.forEach(role => {
+                    let option = document.createElement('option');
+                    option.value = role.id;
+                    option.text = role.name;
+                    select.appendChild(option);
+                });
+            });
+
+        $('#createUserForm').on('submit', function (event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch('/admin/create', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // обновите таблицу или модальное окно
+                });
+        });
+    });
+</script>
+
+</body>
+</html>
+
+// В этом коде:
+
+Я добавил JavaScript-код, который будет получать роли через Fetch API и заполнять выпадающий список ролей.
+Я добавил JavaScript-код, который будет отправлять форму создания нового пользователя через Fetch API.
+Пожалуйста, обратите внимание, что эти изменения предполагают, что у вас есть REST API, которое предоставляет данные о ролях и обрабатывает создание нового пользователя. Вам нужно будет заменить '/admin/roles' и '/admin/create' на реальные URL вашего API.
