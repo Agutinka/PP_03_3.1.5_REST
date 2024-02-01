@@ -12,7 +12,7 @@ import ru.kata.spring.boot_security.demo.services.UserService;
 import java.security.Principal;
 
 @RestController // Аннотация @Controller заменена на @RestController
-@RequestMapping("")
+@RequestMapping("/user/api")
 public class UserController {
 
     private final UserService userService;
@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/user")
+    @GetMapping()
     // Параметр Model был удален, так как в REST контроллерах не используется модель для передачи данных в представление
     public ResponseEntity<User> show(Principal principal) {
         User user = userService.findUserByUsername(principal.getName());
