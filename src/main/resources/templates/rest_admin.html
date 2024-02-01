@@ -190,27 +190,6 @@
             }
         );
     })();
-
-    $(document).ready(function () {
-        // fetch('/admin/create')
-        //     .then(response => response.text())
-        //     .then(data => {
-        //         $("#createFormContainer").html(data);
-        //     });
-
-
-        // Показываем модальное окно "Edit" при клике на кнопку Edit
-        $('[data-target^="#editModal"]').click(function () {
-            var userId = $(this).data('user-id');
-            $('#editModal' + userId).modal('show');
-        });
-
-        // Показываем модальное окно "Delete" при клике на кнопку Delete
-        $('[data-target^="#deleteModal"]').click(function () {
-            var userId = $(this).data('user-id');
-            $('#deleteModal' + userId).modal('show');
-        });
-    });
 </script>
 
 </body>

@@ -23,7 +23,6 @@ public class UserController {
     }
 
     @GetMapping()
-    // Параметр Model был удален, так как в REST контроллерах не используется модель для передачи данных в представление
     public ResponseEntity<User> show(Principal principal) {
         User user = userService.findUserByUsername(principal.getName());
         // Метод show() теперь возвращает ResponseEntity с объектом User

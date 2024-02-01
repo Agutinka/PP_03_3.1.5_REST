@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,7 @@
 </head>
 <body>
 <div th:fragment="content">
-    <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal fade" th:id="'deleteModal' + ${user.getId()}" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -26,47 +26,61 @@
 
                     <div class="form-group">
                         <label for="userId"><strong>ID</strong></label>
-                        <input type="text" class="form-control" id="userId" readonly>
+                        <input type="text" class="form-control" id="userId"
+                               readonly
+                               th:value="${user.getId()}">
                     </div>
 
                     <div class="form-group">
                         <label for="username"><strong>First Name</strong></label>
-                        <input type="text" class="form-control" id="username" readonly>
+                        <input type="text" class="form-control" id="username"
+                               readonly th:value="${user.getUsername()}">
                     </div>
 
                     <div class="form-group">
                         <label for="secondname"><strong>Last Name</strong></label>
-                        <input type="text" class="form-control" id="secondname" readonly>
+                        <input type="text" class="form-control" id="secondname"
+                               readonly th:value="${user.getSecondname()}">
                     </div>
 
                     <div class="form-group">
                         <label for="age"><strong>Age</strong></label>
-                        <input type="text" class="form-control" id="age" readonly>
+                        <input type="text" class="form-control" id="age" readonly
+                               th:value="${user.getAge()}">
                     </div>
 
                     <div class="form-group">
                         <label for="email"><strong>Email</strong></label>
-                        <input type="text" class="form-control" id="email" readonly>
+                        <input type="text" class="form-control" id="email" readonly
+                               th:value="${user.getEmail()}">
                     </div>
 
                     <div class="form-group">
                         <label for="password"><strong>Password</strong></label>
-                        <input type="password" class="form-control" id="password" readonly>
+                        <input type="password" class="form-control" id="password"
+                               readonly th:value="${user.getPassword()}">
                     </div>
 
                     <div class="form-group role-group">
                         <label for="roleSelect"><strong>Role</strong></label>
+
                         <select class="form-control" id="roleSelect" multiple disabled>
+                            <option th:each="role : ${user.getRoles()}"
+                                    th:value="${role.getId()}"
+                                    th:text="${role.toString()}">
+                            </option>
                         </select>
                     </div>
+
+
 
                 </div>
                 <div class="modal-footer">
                     <!-- Кнопки для закрытия или удаления данных -->
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Close
                     </button>
-                    <form id="deleteUserForm" method="POST">
-                        <input type="hidden" id="userIdToDelete" name="id">
+                    <form th:method="post" th:action="@{/admin/delete}" class="delete-form">
+                        <input type="hidden" name="id" th:value="${user.getId()}">
                         <button type="submit" class="btn btn-danger delete-btn">Delete</button>
                     </form>
                 </div>
@@ -74,59 +88,10 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#deleteModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var userId = button.data('user-id'); // Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-            fetch('/admin/edit/' + userId)
-                .then(response => response.json())
-                .then(data => {
-                    $('#userId').val(data.id);
-                    $('#username').val(data.username);
-                    $('#secondname').val(data.secondname);
-                    $('#age').val(data.age);
-                    $('#email').val(data.email);
-                    $('#password').val(data.password);
-                    let select = document.getElementById('roleSelect');
-                    data.roles.forEach(role => {
-                        let option = document.createElement('option');
-                        option.value = role.id;
-                        option.text = role.name;
-                        select.appendChild(option);
-                    });
-                    $('#userIdToDelete').val(data.id);
-                });
-        });
-
-        $('#deleteUserForm').on('submit', function (event) {
-            event.preventDefault();
-            let formData = new FormData(this);
-            fetch('/admin/delete', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // обновите таблицу или модальное окно
-                });
-        });
-    });
-</script>
 
 </body>
 </html>
-
-// В этом коде:
-
-Я добавил JavaScript-код, который будет получать данные о пользователе через Fetch API и заполнять форму удаления при открытии модального окна.
-Я добавил JavaScript-код, который будет отправлять форму удаления через Fetch API.
-Пожалуйста, обратите внимание, что эти изменения предполагают, что у вас есть REST API, которое предоставляет данные о пользователе и обрабатывает удаление. Вам нужно будет заменить '/admin/edit/' и '/admin/delete' на реальные URL вашего API.
