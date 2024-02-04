@@ -30,10 +30,13 @@ public class Role {
     public Role() {
     }
 
-    public Role(Long id, String name, Set<User> users) {
+    public Role(Long id, Set<User> users) {
         this.id = id;
-        this.name = name;
         this.users = users;
+    }
+
+    public Role(String name) {
+        this.name = name;
     }
 
     public Long getId() {
