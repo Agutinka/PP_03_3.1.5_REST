@@ -13,71 +13,92 @@
 </head>
 <body>
 
-<!-- Форма для отправки данных на сервер -->
-<form th:action="@{/admin/edit}" method="POST" th:object="${user}">
-    <div>
-        <div class="form-group">
-            <label for="userId"><strong>ID:</strong></label>
-            <input type="text" class="form-control" id="userId"
-                   readonly th:value="${user.getId()}" name="id">
-        </div>
+<div th:fragment="content">
+    <div class="modal" tabindex="-1" id="editModal"
+         aria-labelledby="EditModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <!-- Заполнение модального окна данными пользователя через JSON-->
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div>
+                            <div class="form-group">
+                                <label for="edit-id"><strong>ID</strong></label>
+                                <input type="text" class="form-control"
+                                       id="edit-id"
+                                       name="id" disabled>
+                            </div>
 
-        <div class="form-group">
-            <label for="username">First Name:</label>
-            <input type="text" class="form-control" id="username"
-                   th:value="${user.getUsername()}" name="username">
-        </div>
+                            <div class="form-group">
+                                <label for="edit-username">First Name</label>
+                                <input type="text" class="form-control"
+                                       id="edit-username"
+                                       name="username" required>
+                            </div>
 
-        <div class="form-group">
-            <label for="secondname">Last Name:</label>
-            <input type="text" class="form-control" id="secondname"
-                   th:value="${user.getSecondname()}"
-                   name="secondname">
-        </div>
+                            <div class="form-group">
+                                <label for="edit-secondname">Last Name:</label>
+                                <input type="text" class="form-control"
+                                       id="edit-secondname"
+                                       name="secondname" required>
+                            </div>
 
-        <div class="form-group">
-            <label for="age">Age:</label>
-            <input type="text" class="form-control" id="age"
-                   th:value="${user.getAge()}" name="age">
-        </div>
+                            <div class="form-group">
+                                <label for="edit-age">Age:</label>
+                                <input type="text" class="form-control"
+                                       id="edit-age"
+                                       name="age" required>
+                            </div>
 
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="text" class="form-control" id="email"
-                   th:value="${user.getEmail()}" name="email">
-        </div>
+                            <div class="form-group">
+                                <label for="edit-email">Email:</label>
+                                <input type="text" class="form-control"
+                                       id="edit-email"
+                                       name="email" required>
+                            </div>
 
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" class="form-control"
-                   id="password" th:value="${user.getPassword()}"
-                   name="password">
-        </div>
+                            <div class="form-group">
+                                <label for="edit-password">Password:</label>
+                                <input type="password" class="form-control"
+                                       id="edit-password"
+                                       name="password">
+                            </div>
 
-        <div class="form-group role-group">
-            <label for="roleSelect">Role</label>
+                            <div class="form-group role-group">
+                                <label for="edit-role">Role</label>
 
-            <select class="form-control" id="roleSelect" name="roles"
-                    multiple data-live-search="true">
-                <option th:each="roles : ${role}" th:value="${roles.getId()}"
-                        th:text="${roles.getName().replace('ROLE_', '')}"></option>
-            </select>
-        </div>
-        <br>
-        <div class="modal-footer">
-            <!-- Кнопки для закрытия или сохранения данных -->
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">
-                Close
-            </button>
-            <button type="submit" class="btn btn-primary">Edit</button>
+                                <select class="form-control" name="role"
+                                        id="edit-role"
+                                        aria-label="Default select example"
+                                        size="2" multiple required>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="modal-footer">
+                        <!-- Кнопки для закрытия или сохранения данных -->
+                        <button type="button" class="btn btn-secondary"
+                                id="editClose" data-dismiss="modal">
+                            Close
+                        </button>
+                        <!--            <button type="submit" class="btn btn-primary">Edit</button>-->
+                        <input type="submit" class="btn btn-primary"
+                               value="Edit"/>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</form>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+</div>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
-
+<script src="/js/edit.js"></script>
 </body>
 </html>

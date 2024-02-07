@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kata.spring.boot_security.demo.exception_handling.NoSuchUserException;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import java.util.List;
@@ -21,10 +23,12 @@ import java.util.List;
 @RequestMapping("/admin/api")
 public class RestAdminController {
     private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public RestAdminController(UserService userService) {
+    public RestAdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping("/users")
@@ -72,5 +76,11 @@ public class RestAdminController {
         userService.deleteById(id);
 
         return "Пользователь с ID = " + id + " был успешно удалён";
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getAllRoles(){
+        List <Role> roleList = roleService.getAllRoles();
+        return new ResponseEntity<>(roleList,HttpStatus.OK);
     }
 }
