@@ -33,13 +33,11 @@ public class RestAdminController {
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAll();
-        // Метод getAllUsers() теперь возвращает ResponseEntity с объектом List<User>
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")
-    public User getUserById(@PathVariable long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getById(id);
 
         if(user == null) {
@@ -47,10 +45,10 @@ public class RestAdminController {
                     id + " в Базе Данных");
         }
 
-        return user; //возвращается НЕ сам объект user, а JSON, соответствующий этому объекту
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     // Аннотация @ModelAttribute заменена на @RequestBody
     public ResponseEntity<User> addUser(@RequestBody User user) {
         userService.save(user);
@@ -58,24 +56,16 @@ public class RestAdminController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    // вариант с возвращением НЕ самого объекта user, а JSON, соответствующий обновленному пользователю
-    @PutMapping("/edit")
-    public User edit(@RequestBody User user) {
+    @PutMapping("/update")
+    public ResponseEntity<User> edit(@RequestBody User user) {
         userService.update(user);
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteUser (@PathVariable long id) {
-        User user = userService.getById(id);
-
-        if (user == null) {
-            throw new NoSuchUserException("Пользователя с ID = " +
-                    id + " не существует в Базе Данных");
-        }
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
-
-        return "Пользователь с ID = " + id + " был успешно удалён";
+        return new ResponseEntity<>("Пользователь с ID = " + id + " был успешно удалён", HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/roles")

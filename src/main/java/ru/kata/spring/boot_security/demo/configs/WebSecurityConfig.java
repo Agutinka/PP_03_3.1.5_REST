@@ -54,8 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()  // Отключение CSRF защиты
                 .authorizeRequests()  // Настройка правил авторизации
                 .antMatchers("/", "/login").hasAnyRole("ADMIN", "USER")  // Разрешение доступа без аутентификации
-                .antMatchers("/user", "/logout").hasRole("USER")  // для доступа к этим путям должна быть роль USER
-                .antMatchers("/admin", "/create", "/edit", "/delete", "/user").hasRole("ADMIN")  // для доступа к этим путям должна быть роль ADMIN
+                .antMatchers("/user/**", "/logout").hasRole("USER")  // для доступа к этим путям должна быть роль USER
+                .antMatchers("/admin/**", "/user/**").hasRole("ADMIN")  // для доступа к этим путям должна быть роль ADMIN
                 .and()  // Завершение настройки для authorizeRequests
                 .formLogin()  // Включение формы для аутентификации
                 .successHandler(successUserHandler).permitAll()  // Установка пользовательского обработчика успешной аутентификации для всех пользователей
