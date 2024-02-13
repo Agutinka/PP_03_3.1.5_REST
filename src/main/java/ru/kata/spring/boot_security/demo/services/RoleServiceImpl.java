@@ -13,34 +13,16 @@ import java.util.Set;
 
 @Service
 public class RoleServiceImpl implements RoleService {
+
     private final RoleRepository roleRepository;
 
-    @Autowired
+
     public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
 
     @Override
-    public List<Role> getAllRoles() {
+    public List<Role> getListRoles() {
         return roleRepository.findAll();
-    }
-
-    @Override
-    @Transactional
-    public void save(Role role) {
-        roleRepository.save(role);
-
-    }
-
-    public void addUserToRole(User user) {
-        Set<User> users = new HashSet<>();
-        if (users == null) {
-            users = new HashSet<>();
-        }
-        users.add(user);
-    }
-    @Override
-    public Role showUserById(Long id) {
-        return roleRepository.getById(id);
     }
 }

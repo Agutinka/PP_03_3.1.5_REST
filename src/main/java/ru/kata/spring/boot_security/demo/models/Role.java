@@ -1,6 +1,6 @@
 package ru.kata.spring.boot_security.demo.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,41 +9,34 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "roles")
-public class Role {
-
+@Table(name = "role")
+public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "name")
+    private long id;
+    @Column(name = "name", unique = true)
     private String name;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
-
-    public Role() {
-    }
-
-    public Role(Long id, Set<User> users) {
+    public Role(long id) {
         this.id = id;
-        this.users = users;
     }
+
 
     public Role(String name) {
         this.name = name;
     }
 
-    public Long getId() {
+    public Role() {}
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -55,16 +48,22 @@ public class Role {
         this.name = name;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    @Override
+    public String getAuthority() {
+        return getName();
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+        Role role = (Role) o;
+
+        return Objects.equals(name, role.name);
     }
 
     @Override
-    public String toString() {
-        return name.replace("ROLE_", " ");
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }

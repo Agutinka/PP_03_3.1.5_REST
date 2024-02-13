@@ -1,43 +1,64 @@
 package ru.kata.spring.boot_security.demo.initialization;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.services.RoleService;
-import ru.kata.spring.boot_security.demo.services.UserService;
+import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-
-import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class Initialization {
-    UserService userService;
-    RoleService roleService;
+public class Initialization implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Autowired
-    public Initialization(UserService userService, RoleService roleService) {
-        this.userService = userService;
-        this.roleService = roleService;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public Initialization(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-    @Transactional
-    @PostConstruct
-    public void run() {
 
-        roleService.save(new Role("ROLE_ADMIN"));
-        roleService.save(new Role("ROLE_USER"));
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        Set<Role> adminRole = new HashSet<>();
-        Set<Role> userRole = new HashSet<>();
-        adminRole.add(roleService.showUserById(2L));
-        adminRole.add(roleService.showUserById(1L));
-        userRole.add(roleService.showUserById(2L));
+        Role role1 = new Role();
+        role1.setName("ROLE_USER");
+        Role role2 = new Role();
+        role2.setName("ROLE_ADMIN");
 
-        userService.save(new User(1L, "admin", "admin", 35, "admin@mail.ru", "admin", adminRole));
-        userService.save(new User(2L, "test_user1", "user1", 11, "user1@mail.ru", "test_password", userRole));
+        roleRepository.save(role1);
+        roleRepository.save(role2);
+
+        List<Role> adminRoles = new ArrayList<>();
+        adminRoles.add(role1);
+        adminRoles.add(role2);
+
+        List<Role> userRoles = new ArrayList<>();
+        userRoles.add(role1);
+
+        User admin = new User();
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setRoles(adminRoles);
+        admin.setUsername("admin");
+        admin.setLastName("admin");
+        admin.setAge(35);
+        admin.setEmail("admin@mail.ru");
+        userRepository.save(admin);
+
+        User user = new User();
+        user.setPassword(passwordEncoder.encode("test_password"));
+        user.setRoles(userRoles);
+        user.setUsername("test_user1");
+        user.setLastName("user1");
+        user.setAge(25);
+        user.setEmail("user1@mail.ru");
+        userRepository.save(user);
     }
 }

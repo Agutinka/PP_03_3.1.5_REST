@@ -1,11 +1,8 @@
 package ru.kata.spring.boot_security.demo.models;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,57 +13,83 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.Collection;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-@Setter
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User implements UserDetails {
-
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    private long id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
-
-    @Setter
-    @Getter
-    @Column(name = "secondname")
-    private String secondname;
-
-    @Setter
-    @Getter
+    @Column(name = "lastName")
+    private String lastName;
     @Column(name = "age")
     private int age;
 
-    @Setter
-    @Getter
+    @Column(name = "password")
+    private String password;
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password")
-    private String password;
 
-    @Getter
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"),
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private List<Role> roles = new ArrayList<>();
+
+
 
     public User() {
     }
 
-    public User(Long id, String username, String secondname, int age, String email, String password, Set<Role> roles) {
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public User(long id, String username, String lastName, int age, String password, String email, List<Role> roles) {
         this.id = id;
         this.username = username;
-        this.secondname = secondname;
+        this.lastName = lastName;
         this.age = age;
-        this.email = email;
         this.password = password;
+        this.email = email;this.roles = roles;
+
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
@@ -77,43 +100,72 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public List<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
     }
 
-    @Override
     public String getPassword() {
         return password;
     }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", secondname='" + secondname + '\'' +
-                ", age=" + age +
-                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
                 '}';
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return username != null ? username.hashCode() : 0;
     }
 }

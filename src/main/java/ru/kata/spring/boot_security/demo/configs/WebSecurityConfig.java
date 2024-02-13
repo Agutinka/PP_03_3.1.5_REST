@@ -11,37 +11,36 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import ru.kata.spring.boot_security.demo.services.CustomUserDetailService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
-    private final UserService userService;
+    private final CustomUserDetailService customUserDetailService;
 
-    @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
+
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, CustomUserDetailService customUserDetailService) {
         this.successUserHandler = successUserHandler;
-        this.userService = userService;
+        this.customUserDetailService = customUserDetailService;
     }
 
-    @Bean
+
     @Override
-    public UserDetailsService userDetailsService() {
-        return userService;
-    }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-        daoAuthenticationProvider.setUserDetailsService(userService);
-        return daoAuthenticationProvider;
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/", "/login").permitAll()
+                .antMatchers("/admins/**", "/api/admins/**").hasRole("ADMIN")
+                .antMatchers("/user/**", "/api/user/**").hasAnyRole("USER", "ADMIN")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().successHandler(successUserHandler).permitAll()
+                .and()
+                .logout().logoutUrl("/logout").permitAll()
+                .logoutSuccessUrl("/login");
     }
 
     @Override
@@ -49,19 +48,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()  // Отключение CSRF защиты
-                .authorizeRequests()  // Настройка правил авторизации
-                .antMatchers("/", "/login").hasAnyRole("ADMIN", "USER")  // Разрешение доступа без аутентификации
-                .antMatchers("/user/**", "/logout").hasRole("USER")  // для доступа к этим путям должна быть роль USER
-                .antMatchers("/admin/**", "/user/**").hasRole("ADMIN")  // для доступа к этим путям должна быть роль ADMIN
-                .and()  // Завершение настройки для authorizeRequests
-                .formLogin()  // Включение формы для аутентификации
-                .successHandler(successUserHandler).permitAll()  // Установка пользовательского обработчика успешной аутентификации для всех пользователей
-                .and()  // Завершение настройки для formLogin
-                .logout()  // Включение поддержки выхода из системы
-                .logoutUrl("/logout").permitAll()  // Указание URL для выполнения выхода с доступом для всех пользователей
-                .logoutSuccessUrl("/login");  // Установка URL для переадресации после успешного выхода
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
+        authenticationProvider.setUserDetailsService(customUserDetailService);
+        return authenticationProvider;
     }
 }

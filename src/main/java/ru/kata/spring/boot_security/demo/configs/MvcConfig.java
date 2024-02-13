@@ -9,11 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/user").setViewName("rest_user");
-        registry.addViewController("/admin").setViewName("rest_admin");
-//        registry.addViewController("/create").setViewName("create");
-//        registry.addViewController("/update/**").setViewName("edit-modal-content");
-//        registry.addViewController("/delete/**").setViewName("delete-modal-content");
+        registry.addViewController("/user").setViewName("user");
+        registry.addViewController("/admins").setViewName("admin");
     }
 
     @Override
